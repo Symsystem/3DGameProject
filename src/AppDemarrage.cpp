@@ -7,12 +7,16 @@
 
 #include "AppDemarrage.h"
 
-AppDemarrage::AppDemarrage(): mRoot(0), mWindow(0), mSceneMgr(0), mCamera(0) {
+AppDemarrage::AppDemarrage(): mRoot(0), mWindow(0), mSceneMgr(0), mCamera(0), mInputListener(0), node(0) {
 
 }
 
 AppDemarrage::~AppDemarrage() {
 	delete mRoot;
+	delete mWindow;
+	delete mSceneMgr;
+	delete mCamera;
+	delete mInputListener;
 }
 
 bool AppDemarrage::start() {
@@ -77,6 +81,10 @@ bool AppDemarrage::start() {
 	// instancie le FrameListener
 	createFrameListener();
 
+	Ogre::Radian angle(0.002f);
+
+	Ogre::Quaternion quatRotate(angle, Ogre::Vector3(0.0f, 1.0f, 0.0f));
+
 	// Boucle infinie "toute faite" par Ogre
 	// mRoot->startRendering();
 
@@ -86,6 +94,7 @@ bool AppDemarrage::start() {
 		// Methode qui prend en charge le raffraichissement de la fenêtre :
 		Ogre::WindowEventUtilities::messagePump();
 
+		node->rotate(quatRotate);
 		// Pour stopper le processus quand on ferme la fenêtre:
 		if(mWindow->isClosed())
 		    return false;
@@ -133,7 +142,7 @@ void AppDemarrage::createScene()
 
 	// Ajout des modèles 3D
 	Ogre::Entity *ent = mSceneMgr->createEntity("protecteur", "Cylinder.mesh");
-	Ogre::SceneNode *node = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+	node = mSceneMgr->getRootSceneNode()->createChildSceneNode();
 	node->attachObject(ent);
 }
 

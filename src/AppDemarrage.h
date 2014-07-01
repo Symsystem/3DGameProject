@@ -29,6 +29,8 @@ private:
 	Ogre::SceneManager *mSceneMgr;
 	Ogre::Camera *mCamera;
 
+	Ogre::SceneNode *node;
+
 	InputListener* mInputListener;
 };
 
