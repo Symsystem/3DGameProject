@@ -8,7 +8,7 @@
 *.so
 *.dylib
 *.dll
-bin/*
+lib/*
 
 # Compiled Static libraries
 *.lai
@@ -20,6 +20,7 @@ bin/*
 *.exe
 *.out
 *.app
+bin/*
 Debug/*
 Release/*
 
