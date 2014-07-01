@@ -7,7 +7,7 @@
 
 #include "AppDemarrage.h"
 
-AppDemarrage::AppDemarrage(): mRoot(0), mWindow(0), mSceneMgr(0), mCamera(0), mInputListener(0), node(0) {
+AppDemarrage::AppDemarrage(): mRoot(0), mWindow(0), mSceneMgr(0), mCamera(0), mInputListener(0), mNode(0) {
 
 }
 
@@ -81,10 +81,6 @@ bool AppDemarrage::start() {
 	// instancie le FrameListener
 	createFrameListener();
 
-	Ogre::Radian angle(0.002f);
-
-	Ogre::Quaternion quatRotate(angle, Ogre::Vector3(0.0f, 1.0f, 0.0f));
-
 	// Boucle infinie "toute faite" par Ogre
 	// mRoot->startRendering();
 
@@ -94,7 +90,6 @@ bool AppDemarrage::start() {
 		// Methode qui prend en charge le raffraichissement de la fenêtre :
 		Ogre::WindowEventUtilities::messagePump();
 
-		node->rotate(quatRotate);
 		// Pour stopper le processus quand on ferme la fenêtre:
 		if(mWindow->isClosed())
 		    return false;
@@ -142,12 +137,20 @@ void AppDemarrage::createScene()
 
 	// Ajout des modèles 3D
 	Ogre::Entity *ent = mSceneMgr->createEntity("protecteur", "Cylinder.mesh");
-	node = mSceneMgr->getRootSceneNode()->createChildSceneNode();
-	node->attachObject(ent);
+	mNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+	mNode->attachObject(ent);
+
+	mRobot = mSceneMgr->createEntity("Robot", "robot.mesh");
+	mRobotNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("RobotNode");
+	mRobotNode->attachObject(mRobot);
 }
 
 void AppDemarrage::createFrameListener()
 {
-    mInputListener = new InputListener(mWindow, mCamera);
+	mAnimationState = mRobot->getAnimationState("Idle");
+	mAnimationState->setLoop(true);
+	mAnimationState->setEnabled(true);
+
+    mInputListener = new InputListener(mWindow, mCamera, mNode, mAnimationState);
     mRoot->addFrameListener(mInputListener);
 }

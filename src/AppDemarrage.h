@@ -29,7 +29,11 @@ private:
 	Ogre::SceneManager *mSceneMgr;
 	Ogre::Camera *mCamera;
 
-	Ogre::SceneNode *node;
+	Ogre::SceneNode *mNode;
+
+	Ogre::SceneNode *mRobotNode;
+	Ogre::Entity *mRobot;
+	Ogre::AnimationState* mAnimationState;
 
 	InputListener* mInputListener;
 };

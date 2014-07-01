@@ -14,7 +14,7 @@
 class InputListener : public Ogre::FrameListener, public Ogre::WindowEventListener, OIS::KeyListener, OIS::MouseListener {
 
 public:
-	InputListener(Ogre::RenderWindow *wnd, Ogre::Camera *camera);
+	InputListener(Ogre::RenderWindow *wnd, Ogre::Camera *camera, Ogre::SceneNode *node, Ogre::AnimationState *animationState);
 	~InputListener();
 
 	// Appelée pendant que l'image est en cours de rendu
@@ -35,6 +35,8 @@ public:
 private:
 	Ogre::RenderWindow* mWindow;
 	Ogre::Camera* 		mCamera;
+	Ogre::SceneNode*	mNode;
+	Ogre::AnimationState *mAnimationState;
 
 	OIS::InputManager*  mInputManager;
 	OIS::Mouse*			mMouse;
@@ -42,6 +44,7 @@ private:
 
 	bool mContinuer;
 
+	Ogre::Radian mAngle;
 	Ogre::Vector3 mMouvement;
 	Ogre::Real mVitesse;
 	Ogre::Real mVitesseRotation;

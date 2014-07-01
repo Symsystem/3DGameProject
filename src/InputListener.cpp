@@ -6,14 +6,18 @@
  */
 
 #include "InputListener.h"
+#include "AppDemarrage.h"
 
-InputListener::InputListener(Ogre::RenderWindow *wnd, Ogre::Camera *camera)
+InputListener::InputListener(Ogre::RenderWindow *wnd, Ogre::Camera *camera, Ogre::SceneNode *node, Ogre::AnimationState *animationState)
 {
 	mWindow = wnd;
 	mCamera = camera;
 
 	mContinuer = true;
 
+	mNode = node;
+	mAnimationState = animationState;
+	mAngle = 0.0;
 	mMouvement = Ogre::Vector3::ZERO;
 	mVitesse = 100;
 	mVitesseRotation = 0.2;
@@ -35,9 +39,12 @@ bool InputListener::frameRenderingQueued(const Ogre::FrameEvent& evt)
 	mKeyboard->capture();
 	mMouse->capture();
 
+	mNode->rotate(Ogre::Quaternion(mAngle, Ogre::Vector3(0.0f, 1.0f, 0.0f)));
 	Ogre::Vector3 deplacement = Ogre::Vector3::ZERO;
 	deplacement = mMouvement * mVitesse * evt.timeSinceLastFrame / 4;
 	mCamera->moveRelative(deplacement);
+
+	mAnimationState->addTime(evt.timeSinceLastFrame);
 
 	return mContinuer;
 }
@@ -136,6 +143,9 @@ bool InputListener::keyPressed(const OIS::KeyEvent &e)
 		case OIS::KC_LSHIFT:
 			mVitesse *= 2;
 			break;
+		case OIS::KC_L:
+			mAngle = 0.002;
+			break;
 	}
     return mContinuer;
 }
@@ -158,6 +168,9 @@ bool InputListener::keyReleased(const OIS::KeyEvent &e)
 	    case OIS::KC_LSHIFT:
 	        mVitesse /= 2;
 	        break;
+	    case OIS::KC_L:
+			mAngle = 0.0;
+			break;
 	}
 	return true;
 }
