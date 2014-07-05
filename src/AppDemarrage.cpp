@@ -147,9 +147,9 @@ void AppDemarrage::createScene()
 
 void AppDemarrage::createFrameListener()
 {
-	mAnimationState = mRobot->getAnimationState("Idle");
+	mAnimationState = mRobot->getAnimationState("Walk");
 	mAnimationState->setLoop(true);
-	mAnimationState->setEnabled(true);
+	mAnimationState->setEnabled(false);
 
     mInputListener = new InputListener(mWindow, mCamera, mNode, mAnimationState);
     mRoot->addFrameListener(mInputListener);

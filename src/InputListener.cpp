@@ -14,6 +14,7 @@ InputListener::InputListener(Ogre::RenderWindow *wnd, Ogre::Camera *camera, Ogre
 	mCamera = camera;
 
 	mContinuer = true;
+	mClick = false;
 
 	mNode = node;
 	mAnimationState = animationState;
@@ -44,7 +45,9 @@ bool InputListener::frameRenderingQueued(const Ogre::FrameEvent& evt)
 	deplacement = mMouvement * mVitesse * evt.timeSinceLastFrame / 4;
 	mCamera->moveRelative(deplacement);
 
-	mAnimationState->addTime(evt.timeSinceLastFrame);
+	if (mClick) {
+		mAnimationState->addTime(evt.timeSinceLastFrame);
+	}
 
 	return mContinuer;
 }
@@ -146,6 +149,10 @@ bool InputListener::keyPressed(const OIS::KeyEvent &e)
 		case OIS::KC_L:
 			mAngle = 0.002;
 			break;
+		case OIS::KC_T:
+			mClick = true;
+			mAnimationState->setEnabled(true);
+			break;
 	}
     return mContinuer;
 }
@@ -171,6 +178,11 @@ bool InputListener::keyReleased(const OIS::KeyEvent &e)
 	    case OIS::KC_L:
 			mAngle = 0.0;
 			break;
+	    case OIS::KC_T:
+	    	mClick = false;
+	    	mAnimationState->setTimePosition(0);
+	    	mAnimationState->setEnabled(false);
+	    	break;
 	}
 	return true;
 }

@@ -43,6 +43,7 @@ private:
 	OIS::Keyboard*		mKeyboard;
 
 	bool mContinuer;
+	bool mClick;
 
 	Ogre::Radian mAngle;
 	Ogre::Vector3 mMouvement;
