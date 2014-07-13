@@ -13,10 +13,10 @@ AppDemarrage::AppDemarrage(): mRoot(0), mWindow(0), mSceneMgr(0), mCamera(0), mI
 
 AppDemarrage::~AppDemarrage() {
 	delete mRoot;
-	delete mWindow;
-	delete mSceneMgr;
-	delete mCamera;
-	delete mInputListener;
+//	delete mWindow;
+//	delete mSceneMgr;
+//	delete mCamera;
+//	delete mInputListener;
 }
 
 bool AppDemarrage::start() {
@@ -95,7 +95,7 @@ bool AppDemarrage::start() {
 		    return false;
 
 		// Pour faire le rendu
-		if(!mRoot->renderOneFrame())
+		if(!mRoot->renderOneFrame()) // Fait le rendu d'une image
 			return false;
 	}
 
@@ -106,9 +106,9 @@ void AppDemarrage::createCamera()
 {
 	mCamera = mSceneMgr->createCamera("Ma Camera");
 	// Position de départ
-	mCamera->setPosition(Ogre::Vector3(0, 0, 100));
+	mCamera->setPosition(Ogre::Vector3(0, 0, 0));
 	// Direction vers laquelle regarde la caméra au départ
-	mCamera->lookAt(Ogre::Vector3(0.0, 0.0, 0.0));
+	mCamera->lookAt(Ogre::Vector3(0.0, 0.0, 1.0));
 	// Distance la plus proche à afficher
 	mCamera->setNearClipDistance(1);
 	// Distance la plus loin à afficher
@@ -127,22 +127,40 @@ void AppDemarrage::createViewports()
 
 void AppDemarrage::createScene()
 {
+    // Réglage de la précision des textures pour les matériaux (ici anisotrope).
+    Ogre::MaterialManager::getSingleton().setDefaultTextureFiltering(Ogre::TFO_ANISOTROPIC);
+    Ogre::MaterialManager::getSingleton().setDefaultAnisotropy(8);
+    
 	// Lumière ambiante :
-	mSceneMgr->setAmbientLight(Ogre::ColourValue(0.1, 0.1, 0.1));
+	mSceneMgr->setAmbientLight(Ogre::ColourValue(0.3, 0.3, 0.3));
 
 	// Lumière diffuse :
-	Ogre::Light* light = mSceneMgr->createLight("light1");
+	/*Ogre::Light* light = mSceneMgr->createLight("light1");
 	light->setPosition(100, 300, 200);
-	light->setDiffuseColour(1.0, 1.0, 1.0);
+	light->setDiffuseColour(1.0, 1.0, 1.0);*/
+    
+    mLight = mSceneMgr->createLight("light1");
+    mLight->setType(Ogre::Light::LT_DIRECTIONAL);
+    mLight->setDirection(10.0, -20.0, -5);
+    mLight->setDiffuseColour(0.8, 0.8, 0.8);
+    
+    mLight->setCastShadows(true);
 
 	// Ajout des modèles 3D
 	Ogre::Entity *ent = mSceneMgr->createEntity("protecteur", "Cylinder.mesh");
 	mNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+    mNode->setPosition(Ogre::Vector3(0, 0, 100));
 	mNode->attachObject(ent);
+    
+    mNode->attachObject(mCamera);
+    mCamera->setPosition(Ogre::Vector3(0, 7, -15));
+    
 
 	mRobot = mSceneMgr->createEntity("Robot", "robot.mesh");
 	mRobotNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("RobotNode");
 	mRobotNode->attachObject(mRobot);
+    
+    createTerrain();
 }
 
 void AppDemarrage::createFrameListener()
@@ -153,4 +171,39 @@ void AppDemarrage::createFrameListener()
 
     mInputListener = new InputListener(mWindow, mCamera, mNode, mAnimationState);
     mRoot->addFrameListener(mInputListener);
+}
+
+void AppDemarrage::createTerrain()
+{
+    mTerrainOptions = OGRE_NEW Ogre::TerrainGlobalOptions();
+    mTerrainOptions->setMaxPixelError(8);
+    
+    mTerrainOptions->setLightMapDirection(mLight->getDerivedDirection());
+    mTerrainOptions->setCompositeMapDistance(3000);
+    mTerrainOptions->setCompositeMapAmbient(mSceneMgr->getAmbientLight());
+    mTerrainOptions->setCompositeMapDiffuse(mLight->getDiffuseColour());
+    
+    mTerrain = OGRE_NEW Ogre::Terrain(mSceneMgr);
+    
+    Ogre::Image img;
+    img.load("terrain.png", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+    
+    Ogre::Terrain::ImportData imp;
+    imp.inputImage = &img;
+    imp.terrainSize = 513;
+    imp.worldSize = 8000;
+    imp.inputScale = 600;
+    imp.minBatchSize = 33;
+    imp.maxBatchSize = 65;
+    
+//    imp.layerList.resize(1);
+//    imp.layerList[0].worldSize = 100;
+//    imp.layerList[0].textureNames.push_back("grass_green-01_diffusespecular.dds");
+//    imp.layerList[0].textureNames.push_back("grass_green-01_normalheight.dds");
+    
+    mTerrain->prepare(imp);
+    mTerrain->load();
+    
+    //Vide la RAM
+    mTerrain->freeTemporaryResources();
 }

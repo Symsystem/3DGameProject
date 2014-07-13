@@ -44,6 +44,7 @@ bool InputListener::frameRenderingQueued(const Ogre::FrameEvent& evt)
 	Ogre::Vector3 deplacement = Ogre::Vector3::ZERO;
 	deplacement = mMouvement * mVitesse * evt.timeSinceLastFrame / 4;
 	mCamera->moveRelative(deplacement);
+    mNode->translate(deplacement);
 
 	if (mClick) {
 		mAnimationState->addTime(evt.timeSinceLastFrame);
@@ -111,8 +112,11 @@ void InputListener::windowClosed(Ogre::RenderWindow* wnd)
 }
 bool InputListener::mouseMoved(const OIS::MouseEvent &e)
 {
-	mCamera->yaw(Ogre::Degree(-mVitesseRotation * e.state.X.rel / 2));
-	mCamera->pitch(Ogre::Degree(-mVitesseRotation * e.state.Y.rel / 2));
+	if (e.state.buttonDown(OIS::MB_Left)){
+        
+        mNode->yaw(Ogre::Degree(-mVitesseRotation * e.state.X.rel / 2));
+        mCamera->pitch(Ogre::Degree(-mVitesseRotation * e.state.Y.rel / 2));
+    }
 	return true;
 }
 bool InputListener::mousePressed(const OIS::MouseEvent &e, OIS::MouseButtonID id)

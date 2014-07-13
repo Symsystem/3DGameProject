@@ -9,6 +9,7 @@
 #define APPDEMARRAGE_H_
 
 #include <Ogre.h>
+#include <Terrain/OgreTerrain.h>
 #include "InputListener.h"
 
 class AppDemarrage {
@@ -22,6 +23,7 @@ public:
 	void createViewports();
 	void createScene();
 	void createFrameListener();
+    void createTerrain();
 
 private:
 	Ogre::Root *mRoot;
@@ -29,11 +31,15 @@ private:
 	Ogre::SceneManager *mSceneMgr;
 	Ogre::Camera *mCamera;
 
+    Ogre::Light* mLight;
 	Ogre::SceneNode *mNode;
 
 	Ogre::SceneNode *mRobotNode;
 	Ogre::Entity *mRobot;
 	Ogre::AnimationState* mAnimationState;
+    
+    Ogre::Terrain* mTerrain;
+    Ogre::TerrainGlobalOptions* mTerrainOptions;
 
 	InputListener* mInputListener;
 };
