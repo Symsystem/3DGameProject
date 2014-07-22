@@ -17,6 +17,8 @@ InputListener::InputListener(Ogre::RenderWindow *wnd, Ogre::Camera *camera, Ogre
     
     mEvt = 0;
     
+    mMouseLeft = false;
+    mMouseBoth = false;
 	mNodePersonnage = node;
 	mAnimationState = animationState;
 	mAngleMouseX = 0.0;
@@ -39,31 +41,53 @@ bool InputListener::frameRenderingQueued(const Ogre::FrameEvent& evt)
 	if(mWindow->isClosed())
 		return false;
 
-	mKeyboard->capture();
-	mMouse->capture();
-
     mEvt = &evt;
+
+	if (mKeyboard)
+		mKeyboard->capture();
+	if (mMouse)
+		mMouse->capture();
+
     
-    std::cout << "Test" << std::endl;
-    
-    Ogre::Vector3 deplacement = Ogre::Vector3::ZERO;
-	deplacement = mMouvement * mVitesse * evt.timeSinceLastFrame / 4;
-    deplacement.normalise();
-    mNodePersonnage->translate(mNodePersonnage->getChild("perso")->getOrientation() * mNodePersonnage->getOrientation() * deplacement);
+    // Rotation du personnage et/ou caméra
     if (mMouse->getMouseState().buttonDown(OIS::MB_Left))
     {
-        mNodePersonnage->getChild("perso")->rotate(Ogre::Quaternion(mAnglePerso * mEvt->timeSinceLastFrame / 4, Ogre::Vector3(0.0f, 1.0f, 0.0f)), Ogre::Node::TS_LOCAL);
+    	mMouseLeft = true;
+    	mNodePersonnage->getChild("perso")->rotate(Ogre::Quaternion(mAnglePerso * mEvt->timeSinceLastFrame / 4, Ogre::Vector3(0.0f, 1.0f, 0.0f)), Ogre::Node::TS_LOCAL);
+        // Si on appuye sur les deux boutons de la souris en même temps
+        if (mMouse->getMouseState().buttonDown(OIS::MB_Right)){
+			mMouseBoth = true;
+			Ogre::Quaternion quat(0,0,0,0);
+			quat = mNodePersonnage->getChild("nodeCamera")->getOrientation();
+			quat.x = 0;
+			quat.z = 0;
+			mMouvement.z = 1;
+			mNodePersonnage->getChild("perso")->setOrientation(quat);
+		}
     }
     else
     {
+    	if (mKeyboard->isKeyDown(OIS::KC_Z))
+    	{
+    		Ogre::Real yawAngle = mNodePersonnage->getChild("perso")->getOrientation().y - mNodePersonnage->getChild("nodeCamera")->getOrientation().y;
+    		if (yawAngle <= 0.02 && yawAngle >= -0.02)
+    			mNodePersonnage->getChild("nodeCamera")->yaw(Ogre::Radian(yawAngle), Ogre::Node::TS_PARENT);
+    		else
+    			mNodePersonnage->getChild("nodeCamera")->yaw(Ogre::Radian(yawAngle) * 4 * mEvt->timeSinceLastFrame, Ogre::Node::TS_PARENT);
+    	}
+    	mMouseLeft = false;
         mNodePersonnage->rotate(Ogre::Quaternion(mAnglePerso * mEvt->timeSinceLastFrame / 4, Ogre::Vector3(0.0f, 1.0f, 0.0f)), Ogre::Node::TS_LOCAL);
-        if (mNodePersonnage->getChild("nodeCamera")->getOrientation() != mNodePersonnage->getChild("perso")->getOrientation() && mKeyboard->isKeyDown(OIS::KC_W))
+        /*if (mNodePersonnage->getChild("nodeCamera")->getOrientation() != mNodePersonnage->getChild("perso")->getOrientation() && mKeyboard->isKeyDown(OIS::KC_W))
         {
             Ogre::Radian angle(2);
             mNodePersonnage->getChild("nodeCamera")->rotate(Ogre::Quaternion(angle * mEvt->timeSinceLastFrame / 4, Ogre::Vector3(0.0f, 1.0f, 0.0f)), Ogre::Node::TS_PARENT);
-        }
+        }*/
     }
 
+    // Déplacement du personnage
+    Ogre::Vector3 deplacement = Ogre::Vector3::ZERO;
+    deplacement = mMouvement * mVitesse * evt.timeSinceLastFrame / 4;
+    mNodePersonnage->translate(mNodePersonnage->getChild("perso")->getOrientation() * mNodePersonnage->getOrientation() * deplacement);
 	if (mClick) {
 		mAnimationState->addTime(evt.timeSinceLastFrame);
 	}
@@ -92,6 +116,7 @@ void InputListener::startOIS()
 	mMouse = static_cast<OIS::Mouse*>(mInputManager->createInputObject( OIS::OISMouse, true ));
 	mKeyboard = static_cast<OIS::Keyboard*>(mInputManager->createInputObject( OIS::OISKeyboard, true ));
 
+	// Car utilisation du buffer
 	mMouse->setEventCallback(this);
 	mKeyboard->setEventCallback(this);
 
@@ -130,13 +155,14 @@ void InputListener::windowClosed(Ogre::RenderWindow* wnd)
 }
 bool InputListener::mouseMoved(const OIS::MouseEvent &e)
 {
-	if (e.state.buttonDown(OIS::MB_Left)){
-        mAngleMouseX = -e.state.X.rel;
-        mAngleMouseY = e.state.Y.rel;
-        mNodePersonnage->getChild("nodeCamera")->rotate(Ogre::Quaternion(mAngleMouseX * mEvt->timeSinceLastFrame / 4, Ogre::Vector3(0.0f, 1.0f, 0.0f)), Ogre::Node::TS_PARENT);
-        mNodePersonnage->getChild("nodeCamera")->rotate(Ogre::Quaternion(mAngleMouseY * mEvt->timeSinceLastFrame / 4, Ogre::Vector3(1.0f, 0.0f, 0.0f)), Ogre::Node::TS_LOCAL);
+    if (mMouseLeft)
+    {
+	mNodePersonnage->getChild("nodeCamera")->yaw(Ogre::Radian(-e.state.X.rel) * mEvt->timeSinceLastFrame / 4, Ogre::Node::TS_PARENT);
+	mNodePersonnage->getChild("nodeCamera")->pitch(Ogre::Radian(e.state.Y.rel) * mEvt->timeSinceLastFrame / 4, Ogre::Node::TS_LOCAL);
+	//mNodePersonnage->getChild("nodeCamera")->rotate(Ogre::Quaternion(mAngleMouseX * mEvt->timeSinceLastFrame / 4, Ogre::Vector3(0.0f, 1.0f, 0.0f)), Ogre::Node::TS_PARENT);
+	//mNodePersonnage->getChild("nodeCamera")->rotate(Ogre::Quaternion(mAngleMouseY * mEvt->timeSinceLastFrame / 4, Ogre::Vector3(1.0f, 0.0f, 0.0f)), Ogre::Node::TS_LOCAL);
     }
-	return true;
+    return true;
 }
 bool InputListener::mousePressed(const OIS::MouseEvent &e, OIS::MouseButtonID id)
 {
@@ -144,8 +170,11 @@ bool InputListener::mousePressed(const OIS::MouseEvent &e, OIS::MouseButtonID id
 }
 bool InputListener::mouseReleased(const OIS::MouseEvent &e, OIS::MouseButtonID id)
 {
-    mAngleMouseX = 0;
-    mAngleMouseY = 0;
+	if ((id == OIS::MB_Right || id == OIS::MB_Left) && mMouseBoth)
+	{
+		mMouvement.z = 0;
+		mMouseBoth = false;
+	}
     return true;
 }
 
@@ -156,13 +185,13 @@ bool InputListener::keyPressed(const OIS::KeyEvent &e)
 		case OIS::KC_ESCAPE:
 			mContinuer = false;
 			break;
-		case OIS::KC_W:
-			mMouvement.z += 1;
+		case OIS::KC_Z:
+			mMouvement.z = 1;
 			break;
 		case OIS::KC_S:
-			mMouvement.z -= 1;
+			mMouvement.z = -1;
 			break;
-		case OIS::KC_A:
+		case OIS::KC_Q:
             mAnglePerso = 10;
 			break;
 		case OIS::KC_D:
@@ -182,13 +211,13 @@ bool InputListener::keyReleased(const OIS::KeyEvent &e)
 {
 	switch(e.key)
 	{
-	    case OIS::KC_W:
-	        mMouvement.z -= 1;
+	    case OIS::KC_Z:
+	        mMouvement.z = 0;
 	        break;
 	    case OIS::KC_S:
-	        mMouvement.z += 1;
+	        mMouvement.z = 0;
 	        break;
-	    case OIS::KC_A:
+	    case OIS::KC_Q:
             mAnglePerso = 0;
 	        break;
 	    case OIS::KC_D:

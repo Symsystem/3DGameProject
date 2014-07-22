@@ -113,10 +113,10 @@ void AppDemarrage::createCamera()
     mNodePersonnage->setPosition(Ogre::Vector3(0, 9 , 0));
     mNodeCamera = mNodePersonnage->createChildSceneNode("nodeCamera");
     mNodeCamera->attachObject(mCamera);
-    mCamera->setPosition(Ogre::Vector3(0, 7, -15));
+    mCamera->setPosition(Ogre::Vector3(0, 7, -20));
     
 	// Direction vers laquelle regarde la caméra au départ
-	mCamera->lookAt(Ogre::Vector3(0.0, 2.0, 0.0));
+	mCamera->lookAt(Ogre::Vector3(0.0, 7.0, 0.0));
 	// Distance la plus proche à afficher
 	mCamera->setNearClipDistance(1);
 	// Distance la plus loin à afficher

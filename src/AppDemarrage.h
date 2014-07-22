@@ -11,7 +11,7 @@
 #include <Ogre.h>
 #include <Terrain/OgreTerrain.h>
 #include "InputListener.h"
-#include "Object3D.h"
+#include "entity/Object3D.h"
 
 class AppDemarrage {
 public:

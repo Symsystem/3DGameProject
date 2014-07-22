@@ -50,6 +50,7 @@ private:
 	Ogre::Radian mAnglePerso;
     Ogre::Radian mAngleMouseX;
     Ogre::Radian mAngleMouseY;
+    bool mMouseLeft, mMouseBoth;
 	Ogre::Vector3 mMouvement;
 	Ogre::Real mVitesse;
 	Ogre::Real mVitesseRotation;

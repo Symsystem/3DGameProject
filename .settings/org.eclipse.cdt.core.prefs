@@ -1,0 +1,11 @@
+eclipse.preferences.version=1
+environment/project/cdt.managedbuild.config.gnu.exe.debug.352622494/OGRE_LOC/delimiter=\:
+environment/project/cdt.managedbuild.config.gnu.exe.debug.352622494/OGRE_LOC/operation=append
+environment/project/cdt.managedbuild.config.gnu.exe.debug.352622494/OGRE_LOC/value=/usr/local/include/OGRE
+environment/project/cdt.managedbuild.config.gnu.exe.debug.352622494/append=true
+environment/project/cdt.managedbuild.config.gnu.exe.debug.352622494/appendContributed=true
+environment/project/cdt.managedbuild.config.gnu.exe.release.993775795/OGRE_LOC/delimiter=\:
+environment/project/cdt.managedbuild.config.gnu.exe.release.993775795/OGRE_LOC/operation=append
+environment/project/cdt.managedbuild.config.gnu.exe.release.993775795/OGRE_LOC/value=/usr/local/include/OGRE
+environment/project/cdt.managedbuild.config.gnu.exe.release.993775795/append=true
+environment/project/cdt.managedbuild.config.gnu.exe.release.993775795/appendContributed=true

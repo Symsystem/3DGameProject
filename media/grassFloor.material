@@ -1,4 +1,4 @@
-material GrassFloor
+material grassFloor
 {
 	technique
 	{
