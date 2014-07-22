@@ -1,4 +1,5 @@
 #include "AppDemarrage.h"
+#include <macUtils.h>
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
 #define WIN32_LEAN_AND_MEAN
@@ -26,3 +27,14 @@ int main(int argc, char *argv[])
 
     return 0;
 }
+
+//#include <QtWidgets/QApplication>
+//#include <QtWidgets/QPushbutton>
+//
+//int main(int argc, char *argv[])
+//{
+//    QApplication testQt(argc, argv);
+//    QPushButton b("Show");
+//    b.show();
+//    return testQt.exec();
+//}

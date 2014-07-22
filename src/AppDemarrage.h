@@ -11,6 +11,7 @@
 #include <Ogre.h>
 #include <Terrain/OgreTerrain.h>
 #include "InputListener.h"
+#include "Object3D.h"
 
 class AppDemarrage {
 public:
@@ -23,23 +24,26 @@ public:
 	void createViewports();
 	void createScene();
 	void createFrameListener();
-    void createTerrain();
+    //void createTerrain();
 
 private:
 	Ogre::Root *mRoot;
 	Ogre::RenderWindow *mWindow;
-	Ogre::SceneManager *mSceneMgr;
 	Ogre::Camera *mCamera;
+	Ogre::SceneManager *mSceneMgr;
 
     Ogre::Light* mLight;
-	Ogre::SceneNode *mNode;
+	Ogre::SceneNode *mNodePersonnage;
+    Ogre::SceneNode *mNodeCamera;
+    
+    Ogre::SceneNode *mNodeSol;
 
 	Ogre::SceneNode *mRobotNode;
 	Ogre::Entity *mRobot;
 	Ogre::AnimationState* mAnimationState;
     
-    Ogre::Terrain* mTerrain;
-    Ogre::TerrainGlobalOptions* mTerrainOptions;
+//    Ogre::Terrain* mTerrain;
+//    Ogre::TerrainGlobalOptions* mTerrainOptions;
 
 	InputListener* mInputListener;
 };

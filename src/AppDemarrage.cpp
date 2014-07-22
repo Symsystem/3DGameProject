@@ -7,7 +7,7 @@
 
 #include "AppDemarrage.h"
 
-AppDemarrage::AppDemarrage(): mRoot(0), mWindow(0), mSceneMgr(0), mCamera(0), mInputListener(0), mNode(0) {
+AppDemarrage::AppDemarrage(): mRoot(0), mWindow(0), mSceneMgr(0), mCamera(0), mInputListener(0), mNodePersonnage(0) {
 
 }
 
@@ -106,9 +106,17 @@ void AppDemarrage::createCamera()
 {
 	mCamera = mSceneMgr->createCamera("Ma Camera");
 	// Position de départ
-	mCamera->setPosition(Ogre::Vector3(0, 0, 0));
+    
+    
+    mNodePersonnage = mSceneMgr->getRootSceneNode()->createChildSceneNode("nodePersonnage");
+    
+    mNodePersonnage->setPosition(Ogre::Vector3(0, 9 , 0));
+    mNodeCamera = mNodePersonnage->createChildSceneNode("nodeCamera");
+    mNodeCamera->attachObject(mCamera);
+    mCamera->setPosition(Ogre::Vector3(0, 7, -15));
+    
 	// Direction vers laquelle regarde la caméra au départ
-	mCamera->lookAt(Ogre::Vector3(0.0, 0.0, 1.0));
+	mCamera->lookAt(Ogre::Vector3(0.0, 2.0, 0.0));
 	// Distance la plus proche à afficher
 	mCamera->setNearClipDistance(1);
 	// Distance la plus loin à afficher
@@ -128,8 +136,8 @@ void AppDemarrage::createViewports()
 void AppDemarrage::createScene()
 {
     // Réglage de la précision des textures pour les matériaux (ici anisotrope).
-    Ogre::MaterialManager::getSingleton().setDefaultTextureFiltering(Ogre::TFO_ANISOTROPIC);
-    Ogre::MaterialManager::getSingleton().setDefaultAnisotropy(8);
+//    Ogre::MaterialManager::getSingleton().setDefaultTextureFiltering(Ogre::TFO_ANISOTROPIC);
+//    Ogre::MaterialManager::getSingleton().setDefaultAnisotropy(8);
     
 	// Lumière ambiante :
 	mSceneMgr->setAmbientLight(Ogre::ColourValue(0.3, 0.3, 0.3));
@@ -147,20 +155,26 @@ void AppDemarrage::createScene()
     mLight->setCastShadows(true);
 
 	// Ajout des modèles 3D
-	Ogre::Entity *ent = mSceneMgr->createEntity("protecteur", "Cylinder.mesh");
-	mNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
-    mNode->setPosition(Ogre::Vector3(0, 0, 100));
-	mNode->attachObject(ent);
+    Object3D *ent = new Object3D(mSceneMgr, "protecteur", "Cylinder.mesh", mNodePersonnage, Ogre::Vector3(0, -5, 0));
+//    Ogre::Entity *ent = mSceneMgr->createEntity("protecteur", "Cylinder.mesh");
+//    mNode->setPosition(Ogre::Vector3(0, 0, 100));
+//	mNode->attachObject(ent);
     
-    mNode->attachObject(mCamera);
-    mCamera->setPosition(Ogre::Vector3(0, 7, -15));
+    //Ajout d'un plan pour le sol
+    Ogre::Plane plan(Ogre::Vector3::UNIT_Y, 0);
+    Ogre::MeshManager::getSingleton().createPlane("sol", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plan, 500, 500, 1, 1, true, 1, 1, 1, Ogre::Vector3::UNIT_Z);
+    Ogre::Entity *entSol= mSceneMgr->createEntity("EntiteSol", "sol");
+    mNodeSol = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+    mNodeSol->attachObject(entSol);
+    entSol->setMaterialName("grassFloor");
     
-
+    // Ajout du robot
 	mRobot = mSceneMgr->createEntity("Robot", "robot.mesh");
 	mRobotNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("RobotNode");
 	mRobotNode->attachObject(mRobot);
+    mRobotNode->translate(Ogre::Vector3(100,0,100));
     
-    createTerrain();
+//    createTerrain();
 }
 
 void AppDemarrage::createFrameListener()
@@ -169,41 +183,56 @@ void AppDemarrage::createFrameListener()
 	mAnimationState->setLoop(true);
 	mAnimationState->setEnabled(false);
 
-    mInputListener = new InputListener(mWindow, mCamera, mNode, mAnimationState);
+    mInputListener = new InputListener(mWindow, mCamera, mNodePersonnage, mAnimationState);
     mRoot->addFrameListener(mInputListener);
 }
 
-void AppDemarrage::createTerrain()
-{
-    mTerrainOptions = OGRE_NEW Ogre::TerrainGlobalOptions();
-    mTerrainOptions->setMaxPixelError(8);
-    
-    mTerrainOptions->setLightMapDirection(mLight->getDerivedDirection());
-    mTerrainOptions->setCompositeMapDistance(3000);
-    mTerrainOptions->setCompositeMapAmbient(mSceneMgr->getAmbientLight());
-    mTerrainOptions->setCompositeMapDiffuse(mLight->getDiffuseColour());
-    
-    mTerrain = OGRE_NEW Ogre::Terrain(mSceneMgr);
-    
-    Ogre::Image img;
-    img.load("terrain.png", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-    
-    Ogre::Terrain::ImportData imp;
-    imp.inputImage = &img;
-    imp.terrainSize = 513;
-    imp.worldSize = 8000;
-    imp.inputScale = 600;
-    imp.minBatchSize = 33;
-    imp.maxBatchSize = 65;
-    
+//void AppDemarrage::createTerrain()
+//{
+//    mTerrain = OGRE_NEW Ogre::Terrain(mSceneMgr);
+//    
+//    // options globales
+//    mTerrainOptions = OGRE_NEW Ogre::TerrainGlobalOptions();
+//    mTerrainOptions->setMaxPixelError(10);
+//    mTerrainOptions->setCompositeMapDistance(8000);
+//    mTerrainOptions->setLightMapDirection(mLight->getDerivedDirection());
+//    mTerrainOptions->setCompositeMapAmbient(mSceneMgr->getAmbientLight());
+//    mTerrainOptions->setCompositeMapDiffuse(mLight->getDiffuseColour());
+//    
+//    Ogre::Image img;
+//    img.load("terrain.png", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+//    
+//    // informations géométriques
+//    Ogre::Terrain::ImportData imp;
+//    imp.inputImage = &img;
+//    imp.terrainSize = img.getWidth();
+//    imp.worldSize = 8000;
+//    imp.inputScale = 600;
+//    imp.minBatchSize = 33;
+//    imp.maxBatchSize = 65;
+//    
+//    // textures
 //    imp.layerList.resize(1);
 //    imp.layerList[0].worldSize = 100;
-//    imp.layerList[0].textureNames.push_back("grass_green-01_diffusespecular.dds");
-//    imp.layerList[0].textureNames.push_back("grass_green-01_normalheight.dds");
-    
-    mTerrain->prepare(imp);
-    mTerrain->load();
-    
-    //Vide la RAM
-    mTerrain->freeTemporaryResources();
-}
+//    imp.layerList[0].textureNames.push_back("terrain.png");
+//    imp.layerList[0].textureNames.push_back("terrain.png");
+//    mTerrain->prepare(imp);
+//    mTerrain->load();
+//    
+//    // plaquage de texture
+//    Ogre::TerrainLayerBlendMap* blendMap1 = mTerrain->getLayerBlendMap(1);
+//    float* pBlend1 = blendMap1->getBlendPointer();
+//    
+//    for (Ogre::uint16 y = 0; y < mTerrain->getLayerBlendMapSize(); ++y)
+//    {
+//        for (Ogre::uint16 x = 0; x < mTerrain->getLayerBlendMapSize(); ++x)
+//        {
+//            *pBlend1++ = 150;
+//        }
+//    }
+//    
+//    blendMap1->dirty();
+//    blendMap1->update();
+//    
+//    mTerrain->freeTemporaryResources();
+//}

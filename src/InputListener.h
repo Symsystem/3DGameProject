@@ -35,8 +35,10 @@ public:
 private:
 	Ogre::RenderWindow* mWindow;
 	Ogre::Camera* 		mCamera;
-	Ogre::SceneNode*	mNode;
+	Ogre::SceneNode*	mNodePersonnage;
 	Ogre::AnimationState *mAnimationState;
+    
+    const Ogre::FrameEvent* mEvt;
 
 	OIS::InputManager*  mInputManager;
 	OIS::Mouse*			mMouse;
@@ -45,7 +47,9 @@ private:
 	bool mContinuer;
 	bool mClick;
 
-	Ogre::Radian mAngle;
+	Ogre::Radian mAnglePerso;
+    Ogre::Radian mAngleMouseX;
+    Ogre::Radian mAngleMouseY;
 	Ogre::Vector3 mMouvement;
 	Ogre::Real mVitesse;
 	Ogre::Real mVitesseRotation;
