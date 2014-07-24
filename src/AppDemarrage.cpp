@@ -7,7 +7,7 @@
 
 #include "AppDemarrage.h"
 
-AppDemarrage::AppDemarrage(): mRoot(0), mWindow(0), mSceneMgr(0), mCamera(0), mInputListener(0), mNodePersonnage(0) {
+AppDemarrage::AppDemarrage(): mRoot(0), mWindow(0), mSceneMgr(0), mCamera(0), mInputListener(0), mNodeMainPlayer(0), mPlayer(0) {
 
 }
 
@@ -15,12 +15,14 @@ AppDemarrage::~AppDemarrage() {
 	delete mRoot;
 //	delete mWindow;
 //	delete mSceneMgr;
-//	delete mCamera;
+	delete mCamera;
+    delete mPlayer;
 //	delete mInputListener;
 }
 
 bool AppDemarrage::start() {
 	//création du root
+
 	mRoot = new Ogre::Root("plugins.cfg", "ogre.cfg", "Ogre.log");
 
 	//chargement des ressources
@@ -61,22 +63,20 @@ bool AppDemarrage::start() {
 	rs->setConfigOption("VSync", "Yes");*/
 
 	// Création de la fenêtre
-	mWindow = mRoot->initialise(true, "Ma fenetre"); // 1er param : ogre crée la fenêtre lui-même ou pas, 2e param: titre de la fenêtre
+	mWindow = mRoot->initialise(true, "3DGameProject"); // 1er param : ogre crée la fenêtre lui-même ou pas, 2e param: titre de la fenêtre
 
 	// Initialisation des resources et du nombre de MipMap par défaut:
 	Ogre::TextureManager::getSingleton().setDefaultNumMipmaps(5);
 	Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 
 	// Création du scene manager :
-	mSceneMgr = mRoot->createSceneManager("DefaultSceneManager", "Mon Scene Manager");
-	mSceneMgr->setAmbientLight(Ogre::ColourValue(1.0f, 1.0f, 1.0f));
-
-	// creation de la camera et du viewport
-	createCamera();
-	createViewports();
+	mSceneMgr = mRoot->createSceneManager("DefaultSceneManager", "SceneManager");
+    
+	// création de la scene avec le viewport, la camera et le player
+    setupScene();
 
 	//remplissage de la scene
-	createScene();
+	remplirScene();
 
 	// instancie le FrameListener
 	createFrameListener();
@@ -102,51 +102,41 @@ bool AppDemarrage::start() {
 	return true;
 }
 
-void AppDemarrage::createCamera()
+void AppDemarrage::setupScene()
 {
-	mCamera = mSceneMgr->createCamera("Ma Camera");
-	// Position de départ
+    // Création du noeud parent du player et de la camera
+    mNodeMainPlayer = mSceneMgr->getRootSceneNode()->createChildSceneNode("nodeMainPlayer");
     
+    // Création du player
+    mPlayer = new Player(mSceneMgr, "sinbad", "Sinbad.mesh", mNodeMainPlayer, Ogre::Vector3(0, 5, 0));
     
-    mNodePersonnage = mSceneMgr->getRootSceneNode()->createChildSceneNode("nodePersonnage");
+    // Création de la camera (associée au player)
+    mCamera = new NewCamera("camera1", mSceneMgr, mNodeMainPlayer, mPlayer);
     
-    mNodePersonnage->setPosition(Ogre::Vector3(0, 9 , 0));
-    mNodeCamera = mNodePersonnage->createChildSceneNode("nodeCamera");
-    mNodeCamera->attachObject(mCamera);
-    mCamera->setPosition(Ogre::Vector3(0, 7, -20));
-    
-	// Direction vers laquelle regarde la caméra au départ
-	mCamera->lookAt(Ogre::Vector3(0.0, 7.0, 0.0));
-	// Distance la plus proche à afficher
-	mCamera->setNearClipDistance(1);
-	// Distance la plus loin à afficher
-	mCamera->setFarClipDistance(20000);
-	// On vérifie si l'ordinateur en est capable, si c'est le cas, on fixe la distance de vue à l'infini.
-//	if (mRoot->getRenderSystem()->getCapabilities()->hasCapability(Ogre::RSC_INFINITE_FAR_PLANE))
-//	    mCamera->setFarClipDistance(0);
-}
-void AppDemarrage::createViewports()
-{
 	// Viewport = "une vue 3D"
-	Ogre::Viewport *vue = mWindow->addViewport(mCamera);
-	vue->setBackgroundColour(Ogre::ColourValue(0.2, 0.3, 1.0));
-	mCamera->setAspectRatio(Ogre::Real(vue->getActualWidth()) / Ogre::Real(vue->getActualHeight()));
+	Ogre::Viewport *vue = mWindow->addViewport(mCamera->getOgreCamera());
+	vue->setBackgroundColour(Ogre::ColourValue(0.5, 0.8, 0.8));
+	mCamera->getOgreCamera()->setAspectRatio(Ogre::Real(vue->getActualWidth()) / Ogre::Real(vue->getActualHeight()));
 }
 
-void AppDemarrage::createScene()
+void AppDemarrage::remplirScene()
 {
     // Réglage de la précision des textures pour les matériaux (ici anisotrope).
-//    Ogre::MaterialManager::getSingleton().setDefaultTextureFiltering(Ogre::TFO_ANISOTROPIC);
-//    Ogre::MaterialManager::getSingleton().setDefaultAnisotropy(8);
+    Ogre::MaterialManager::getSingleton().setDefaultTextureFiltering(Ogre::TFO_ANISOTROPIC);
+    Ogre::MaterialManager::getSingleton().setDefaultAnisotropy(8);
     
 	// Lumière ambiante :
 	mSceneMgr->setAmbientLight(Ogre::ColourValue(0.3, 0.3, 0.3));
+    
+    //ajout d'un brouillard
+    mSceneMgr->setFog(Ogre::FOG_LINEAR, Ogre::ColourValue(0.5f, 0.8f, 0.8f), 0.5, 100, 200);
 
 	// Lumière diffuse :
 	/*Ogre::Light* light = mSceneMgr->createLight("light1");
 	light->setPosition(100, 300, 200);
 	light->setDiffuseColour(1.0, 1.0, 1.0);*/
     
+    // Ajout d'un "soleil"
     mLight = mSceneMgr->createLight("light1");
     mLight->setType(Ogre::Light::LT_DIRECTIONAL);
     mLight->setDirection(10.0, -20.0, -5);
@@ -155,10 +145,6 @@ void AppDemarrage::createScene()
     mLight->setCastShadows(true);
 
 	// Ajout des modèles 3D
-    Object3D *ent = new Object3D(mSceneMgr, "protecteur", "Cylinder.mesh", mNodePersonnage, Ogre::Vector3(0, -5, 0));
-//    Ogre::Entity *ent = mSceneMgr->createEntity("protecteur", "Cylinder.mesh");
-//    mNode->setPosition(Ogre::Vector3(0, 0, 100));
-//	mNode->attachObject(ent);
     
     //Ajout d'un plan pour le sol
     Ogre::Plane plan(Ogre::Vector3::UNIT_Y, 0);
@@ -168,22 +154,17 @@ void AppDemarrage::createScene()
     mNodeSol->attachObject(entSol);
     entSol->setMaterialName("grassFloor");
     
-    // Ajout du robot
-	mRobot = mSceneMgr->createEntity("Robot", "robot.mesh");
-	mRobotNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("RobotNode");
-	mRobotNode->attachObject(mRobot);
-    mRobotNode->translate(Ogre::Vector3(100,0,100));
     
 //    createTerrain();
 }
 
 void AppDemarrage::createFrameListener()
 {
-	mAnimationState = mRobot->getAnimationState("Walk");
-	mAnimationState->setLoop(true);
-	mAnimationState->setEnabled(false);
+//	mAnimationState = mRobot->getAnimationState("Walk");
+//	mAnimationState->setLoop(true);
+//	mAnimationState->setEnabled(false);
 
-    mInputListener = new InputListener(mWindow, mCamera, mNodePersonnage, mAnimationState);
+    mInputListener = new InputListener(mWindow, mCamera, mPlayer);
     mRoot->addFrameListener(mInputListener);
 }
 

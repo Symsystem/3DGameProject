@@ -11,7 +11,8 @@
 #include <Ogre.h>
 #include <Terrain/OgreTerrain.h>
 #include "InputListener.h"
-#include "entity/Object3D.h"
+#include "entity/NewCamera.h"
+#include "entity/Player.h"
 
 class AppDemarrage {
 public:
@@ -20,21 +21,20 @@ public:
 
 	bool start();
 
-	void createCamera();
-	void createViewports();
-	void createScene();
+    void setupScene();
+	void remplirScene();
 	void createFrameListener();
     //void createTerrain();
 
 private:
 	Ogre::Root *mRoot;
 	Ogre::RenderWindow *mWindow;
-	Ogre::Camera *mCamera;
+	NewCamera *mCamera;
 	Ogre::SceneManager *mSceneMgr;
 
     Ogre::Light* mLight;
-	Ogre::SceneNode *mNodePersonnage;
-    Ogre::SceneNode *mNodeCamera;
+    Ogre::SceneNode *mNodeMainPlayer;
+    Player *mPlayer;
     
     Ogre::SceneNode *mNodeSol;
 

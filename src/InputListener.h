@@ -10,17 +10,19 @@
 
 #include <Ogre.h>
 #include <OIS.h>
+#include "NewCamera.h"
+#include "Player.h"
 
 class InputListener : public Ogre::FrameListener, public Ogre::WindowEventListener, OIS::KeyListener, OIS::MouseListener {
 
 public:
-	InputListener(Ogre::RenderWindow *wnd, Ogre::Camera *camera, Ogre::SceneNode *node, Ogre::AnimationState *animationState);
+	InputListener(Ogre::RenderWindow *wnd, NewCamera *camera, Player *player);
 	~InputListener();
 
+	void startOIS();
+    
 	// Appelée pendant que l'image est en cours de rendu
 	bool frameRenderingQueued(const Ogre::FrameEvent& evt);
-
-	void startOIS();
 
 	// Prototypes des méthodes de WindowEventListener
 	void windowResized(Ogre::RenderWindow* rw);
@@ -34,9 +36,8 @@ public:
 
 private:
 	Ogre::RenderWindow* mWindow;
-	Ogre::Camera* 		mCamera;
-	Ogre::SceneNode*	mNodePersonnage;
-	Ogre::AnimationState *mAnimationState;
+	NewCamera* 		mCamera;
+	Player*	mPlayer;
     
     const Ogre::FrameEvent* mEvt;
 
@@ -45,18 +46,6 @@ private:
 	OIS::Keyboard*		mKeyboard;
 
 	bool mContinuer;
-	bool mClick;
-
-	Ogre::Radian mAnglePerso;
-    Ogre::Radian mAngleMouseX;
-    Ogre::Radian mAngleMouseY;
-    bool mMouseLeft, mMouseBoth;
-	Ogre::Vector3 mMouvement;
-	Ogre::Real mVitesse;
-	Ogre::Real mVitesseRotation;
-
-	Ogre::Radian mRotationX;
-	Ogre::Radian mRotationY;
 };
 
 #endif /* INPUTLISTENER_H_ */

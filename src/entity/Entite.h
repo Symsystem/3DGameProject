@@ -9,12 +9,21 @@
 #ifndef ___DGameProject__Entity__
 #define ___DGameProject__Entity__
 
+#define PLAYER_SPEED 10
+
 #include <iostream>
 #include <string>
 
-class Entity {
+class Entite {
     
-private:
+public:
+    Entite(const std::string &name);
+    
+    void setName(const std::string &name);
+    
+    std::string getName();
+    
+protected:
     
     std::string mName;
 };

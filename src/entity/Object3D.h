@@ -12,19 +12,27 @@
 #include <iostream>
 #include <Ogre.h>
 #include <string>
-#include "Entity.h"
+#include "Entite.h"
 
-class Object3D : public Entity {
+class Object3D : public Entite {
     
 public:
     
-    Object3D(Ogre::SceneManager *scnMgr, std::string const &name, std::string const &path, Ogre::SceneNode *node, Ogre::Vector3 position);
+    Object3D(Ogre::SceneManager *scnMgr, std::string const &name, std::string const &path, Ogre::SceneNode *parentNode, Ogre::Vector3 position = Ogre::Vector3::ZERO);
     
-private:
+    void setNode(Ogre::SceneNode *node);
     
-    Ogre::Entity *mOgreEnt;
-    Ogre::SceneNode *mNode;
+    Ogre::Vector3 getPosition() const;
+    Ogre::SceneNode* getNode() const;
+    
+    virtual float getTurnSpeed() const;
+    virtual bool isMovable() const = 0;
+    virtual void setDirection(const Ogre::Vector3 &direction) = 0;
 
+protected:
+    
+    Ogre::Entity *mOgreEntity;
+    Ogre::SceneNode *mNode;
 };
 
 #endif /* defined(___DGameProject__Object3D__) */
