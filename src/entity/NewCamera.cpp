@@ -62,31 +62,8 @@ void NewCamera::updateCamera(const Ogre::Real deltaTime)
     // Lorsqu'on clique sur les deux boutons de la souris
     if (mMouseLeft && mMouseRight && mObject3DAttached->isMovable())
     {
-        // On calcule la direction finale (celle de la camera) vers où on doit arriver
-        Ogre::Vector3 goalDirection = Ogre::Vector3::ZERO;
-        
-        goalDirection += (-1) * mNodeCamera->getOrientation().zAxis();
-        //goalDirection += mDirection.x * mNodeCamera->getOrientation().xAxis();
-        //goalDirection.y = 0;
-        goalDirection.normalise();
-        
-        // Calcul de la rotation à effectuer pour atteindre cette direction
-        Ogre::Quaternion toGoal = mObject3DAttached->getNode()->getOrientation().zAxis().getRotationTo(goalDirection);
-        
-        // Calcul l'angle qu'il faut tourner pour faire face à cette direction
-        Ogre::Real yawToGoal = toGoal.getYaw().valueDegrees();
-        // Représente combien de degrés le personnage PEUT tourner à cette image
-        Ogre::Real yawAtSpeed = yawToGoal / Ogre::Math::Abs(yawToGoal) * deltaTime * mObject3DAttached->getTurnSpeed();
-        
-        // On vérifie qu'on ne tourne pas plus que ce qu'il faut
-        if (yawToGoal < 0) yawToGoal = std::min<Ogre::Real>(0, std::max<Ogre::Real>(yawToGoal, yawAtSpeed)); // Si angle négatif
-        else if (yawToGoal > 0) yawToGoal = std::max<Ogre::Real>(0, std::min<Ogre::Real>(yawToGoal, yawAtSpeed)); // Si angle positif
-        
-        // Enfin on fait la rotation
-        mObject3DAttached->getNode()->yaw(Ogre::Degree(yawToGoal));
-        
-        mObject3DAttached->setDirection(Ogre::Vector3(0, 0, 1));
-        
+        if (!mObject3DAttached->isMoving()) mObject3DAttached->setIsMoving(true);
+        mObject3DAttached->setOrientation(mNodeCamera->getOrientation());
         mMouseBoth = true;
     }
 }
@@ -156,7 +133,7 @@ void NewCamera::mouseUp(const OIS::MouseEvent &e, OIS::MouseButtonID id)
     if (mMouseBoth)
     {
         mMouseBoth = false;
-        mObject3DAttached->setDirection(Ogre::Vector3::ZERO);
+        if (mObject3DAttached->isMoving()) mObject3DAttached->setIsMoving(false);
     }
 }
 

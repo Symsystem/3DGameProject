@@ -31,14 +31,3 @@ int main(int argc, char *argv[])
 
     return 0;
 }
-
-//#include <QtWidgets/QApplication>
-//#include <QtWidgets/QPushbutton>
-//
-//int main(int argc, char *argv[])
-//{
-//    QApplication testQt(argc, argv);
-//    QPushButton b("Show");
-//    b.show();
-//    return testQt.exec();
-//}

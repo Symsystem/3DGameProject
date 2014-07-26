@@ -9,8 +9,6 @@
 #ifndef ___DGameProject__Entity__
 #define ___DGameProject__Entity__
 
-#define PLAYER_SPEED 10
-
 #include <iostream>
 #include <string>
 

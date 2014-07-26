@@ -104,6 +104,10 @@ bool AppDemarrage::start() {
 
 void AppDemarrage::setupScene()
 {
+    // Type d'ombres qu'on va utiliser
+    mSceneMgr->setShadowTechnique(SHADOWTYPE_STENCIL_ADDITIVE);
+    mSceneMgr->setShadowColour(ColourValue(0.5, 0.5, 0.5));
+    
     // Création du noeud parent du player et de la camera
     mNodeMainPlayer = mSceneMgr->getRootSceneNode()->createChildSceneNode("nodeMainPlayer");
     
@@ -117,34 +121,34 @@ void AppDemarrage::setupScene()
 	Ogre::Viewport *vue = mWindow->addViewport(mCamera->getOgreCamera());
 	vue->setBackgroundColour(Ogre::ColourValue(0.5, 0.8, 0.8));
 	mCamera->getOgreCamera()->setAspectRatio(Ogre::Real(vue->getActualWidth()) / Ogre::Real(vue->getActualHeight()));
+    
+    // Réglage de la précision des textures pour les matériaux (ici anisotrope).
+    Ogre::MaterialManager::getSingleton().setDefaultTextureFiltering(Ogre::TFO_ANISOTROPIC);
+    Ogre::MaterialManager::getSingleton().setDefaultAnisotropy(8);
 }
 
 void AppDemarrage::remplirScene()
 {
-    // Réglage de la précision des textures pour les matériaux (ici anisotrope).
-    Ogre::MaterialManager::getSingleton().setDefaultTextureFiltering(Ogre::TFO_ANISOTROPIC);
-    Ogre::MaterialManager::getSingleton().setDefaultAnisotropy(8);
-    
 	// Lumière ambiante :
-	mSceneMgr->setAmbientLight(Ogre::ColourValue(0.3, 0.3, 0.3));
+	mSceneMgr->setAmbientLight(Ogre::ColourValue(0.6, 0.6, 0.6));
     
     //ajout d'un brouillard
     mSceneMgr->setFog(Ogre::FOG_LINEAR, Ogre::ColourValue(0.5f, 0.8f, 0.8f), 0.5, 100, 200);
-
-	// Lumière diffuse :
-	/*Ogre::Light* light = mSceneMgr->createLight("light1");
-	light->setPosition(100, 300, 200);
-	light->setDiffuseColour(1.0, 1.0, 1.0);*/
     
     // Ajout d'un "soleil"
     mLight = mSceneMgr->createLight("light1");
     mLight->setType(Ogre::Light::LT_DIRECTIONAL);
     mLight->setDirection(10.0, -20.0, -5);
-    mLight->setDiffuseColour(0.8, 0.8, 0.8);
-    
+    mLight->setDiffuseColour(0.4, 0.4, 0.4);
     mLight->setCastShadows(true);
 
 	// Ajout des modèles 3D
+    
+	// Lumière diffuse :
+	/*Ogre::Light* light = mSceneMgr->createLight("lightPoint");
+	light->setPosition(15, 30, 15);
+	light->setDiffuseColour(1.0, 1.0, 1.0);
+    light->setCastShadows(true);*/
     
     //Ajout d'un plan pour le sol
     Ogre::Plane plan(Ogre::Vector3::UNIT_Y, 0);
@@ -153,6 +157,7 @@ void AppDemarrage::remplirScene()
     mNodeSol = mSceneMgr->getRootSceneNode()->createChildSceneNode();
     mNodeSol->attachObject(entSol);
     entSol->setMaterialName("grassFloor");
+    entSol->setCastShadows(false);
     
     
 //    createTerrain();
@@ -160,10 +165,6 @@ void AppDemarrage::remplirScene()
 
 void AppDemarrage::createFrameListener()
 {
-//	mAnimationState = mRobot->getAnimationState("Walk");
-//	mAnimationState->setLoop(true);
-//	mAnimationState->setEnabled(false);
-
     mInputListener = new InputListener(mWindow, mCamera, mPlayer);
     mRoot->addFrameListener(mInputListener);
 }
@@ -174,8 +175,8 @@ void AppDemarrage::createFrameListener()
 //    
 //    // options globales
 //    mTerrainOptions = OGRE_NEW Ogre::TerrainGlobalOptions();
-//    mTerrainOptions->setMaxPixelError(10);
-//    mTerrainOptions->setCompositeMapDistance(8000);
+//    mTerrainOptions->setMaxPixelError(15);
+//    mTerrainOptions->setCompositeMapDistance(1000);
 //    mTerrainOptions->setLightMapDirection(mLight->getDerivedDirection());
 //    mTerrainOptions->setCompositeMapAmbient(mSceneMgr->getAmbientLight());
 //    mTerrainOptions->setCompositeMapDiffuse(mLight->getDiffuseColour());
@@ -186,15 +187,15 @@ void AppDemarrage::createFrameListener()
 //    // informations géométriques
 //    Ogre::Terrain::ImportData imp;
 //    imp.inputImage = &img;
-//    imp.terrainSize = img.getWidth();
-//    imp.worldSize = 8000;
-//    imp.inputScale = 600;
-//    imp.minBatchSize = 33;
-//    imp.maxBatchSize = 65;
+//    imp.terrainSize = 257;
+//    imp.worldSize = 1000;
+//    imp.inputScale = 300;
+//    imp.minBatchSize = 9;
+//    imp.maxBatchSize = 17;
 //    
 //    // textures
 //    imp.layerList.resize(1);
-//    imp.layerList[0].worldSize = 100;
+//    imp.layerList[0].worldSize = 50;
 //    imp.layerList[0].textureNames.push_back("terrain.png");
 //    imp.layerList[0].textureNames.push_back("terrain.png");
 //    mTerrain->prepare(imp);

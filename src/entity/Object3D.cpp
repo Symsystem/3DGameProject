@@ -12,7 +12,7 @@ Object3D::Object3D(Ogre::SceneManager *scnMgr, std::string const &name, std::str
 Entite(name)
 {
     mOgreEntity = scnMgr->createEntity(name, path);
-    
+    mOgreEntity->setCastShadows(true);
     mNode = parentNode->createChildSceneNode("node_" + name);
 	mNode->attachObject(mOgreEntity);
     mNode->translate(position);
@@ -36,4 +36,8 @@ Ogre::SceneNode* Object3D::getNode() const
 float Object3D::getTurnSpeed() const
 {
     return 0;
+}
+bool Object3D::isMoving() const
+{
+    return false;
 }

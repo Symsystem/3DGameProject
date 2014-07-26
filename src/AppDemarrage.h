@@ -24,7 +24,7 @@ public:
     void setupScene();
 	void remplirScene();
 	void createFrameListener();
-    //void createTerrain();
+//    void createTerrain();
 
 private:
 	Ogre::Root *mRoot;

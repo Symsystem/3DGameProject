@@ -27,7 +27,9 @@ public:
     
     virtual float getTurnSpeed() const;
     virtual bool isMovable() const = 0;
-    virtual void setDirection(const Ogre::Vector3 &direction) = 0;
+    virtual bool isMoving() const;
+    virtual void setIsMoving(const bool move) = 0;
+    virtual void setOrientation(const Ogre::Quaternion &direction) = 0;
 
 protected:
     
