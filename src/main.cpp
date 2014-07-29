@@ -1,6 +1,6 @@
 #include "AppDemarrage.h"
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_MACOS
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
 #include <macUtils.h>
 #endif
 

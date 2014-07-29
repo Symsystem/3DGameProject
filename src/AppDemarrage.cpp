@@ -124,7 +124,7 @@ void AppDemarrage::setupScene()
     
     // Réglage de la précision des textures pour les matériaux (ici anisotrope).
     Ogre::MaterialManager::getSingleton().setDefaultTextureFiltering(Ogre::TFO_ANISOTROPIC);
-    Ogre::MaterialManager::getSingleton().setDefaultAnisotropy(8);
+    Ogre::MaterialManager::getSingleton().setDefaultAnisotropy(7);
 }
 
 void AppDemarrage::remplirScene()
@@ -143,6 +143,12 @@ void AppDemarrage::remplirScene()
     mLight->setCastShadows(true);
 
 	// Ajout des modèles 3D
+    Ogre::Entity *bonhomme = mSceneMgr->createEntity("2eBonhomme", "sinbad.mesh");
+    Ogre::SceneNode *nodeBon = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+    nodeBon->attachObject(bonhomme);
+    nodeBon->setPosition(Ogre::Vector3(100, 5, 100));
+    
+
     
 	// Lumière diffuse :
 	/*Ogre::Light* light = mSceneMgr->createLight("lightPoint");
@@ -160,7 +166,7 @@ void AppDemarrage::remplirScene()
     entSol->setCastShadows(false);
     
     
-//    createTerrain();
+    //createTerrain();
 }
 
 void AppDemarrage::createFrameListener()
@@ -175,8 +181,9 @@ void AppDemarrage::createFrameListener()
 //    
 //    // options globales
 //    mTerrainOptions = OGRE_NEW Ogre::TerrainGlobalOptions();
-//    mTerrainOptions->setMaxPixelError(15);
-//    mTerrainOptions->setCompositeMapDistance(1000);
+//    mTerrainOptions->setMaxPixelError(8);
+//    mTerrainOptions->setCompositeMapDistance(3000);
+//    
 //    mTerrainOptions->setLightMapDirection(mLight->getDerivedDirection());
 //    mTerrainOptions->setCompositeMapAmbient(mSceneMgr->getAmbientLight());
 //    mTerrainOptions->setCompositeMapDiffuse(mLight->getDiffuseColour());
@@ -187,11 +194,11 @@ void AppDemarrage::createFrameListener()
 //    // informations géométriques
 //    Ogre::Terrain::ImportData imp;
 //    imp.inputImage = &img;
-//    imp.terrainSize = 257;
+//    imp.terrainSize = img.getSize();
 //    imp.worldSize = 1000;
 //    imp.inputScale = 300;
-//    imp.minBatchSize = 9;
-//    imp.maxBatchSize = 17;
+//    imp.minBatchSize = 33;
+//    imp.maxBatchSize = 65;
 //    
 //    // textures
 //    imp.layerList.resize(1);

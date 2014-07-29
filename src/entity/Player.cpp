@@ -41,14 +41,8 @@ void Player::setupAnimations()
 
 void Player::updatePlayer(const Ogre::Real deltaTime)
 {
-    // On déplace le personnage
-    if (mMove)
-    {
-        Ogre::Vector3 deplacement = Ogre::Vector3::UNIT_Z * deltaTime * RUN_SPEED;
-        mNodeMainPlayer->translate(mNode->getOrientation() * mNodeMainPlayer->getOrientation() * deplacement);
-    }
-    
-    // On calcule la direction finale (celle de la camera) vers où on doit arriver
+    // Rotation du personnage :
+    // On calcule la direction finale vers où on doit arriver
     Ogre::Vector3 goalDirection = Ogre::Vector3::ZERO;
     
     goalDirection += mNodeGoal->getOrientation().zAxis() * (-1);
@@ -68,6 +62,13 @@ void Player::updatePlayer(const Ogre::Real deltaTime)
     
     // Enfin on fait la rotation
     mNode->yaw(Ogre::Degree(yawToGoal));
+    
+    // On déplace le personnage
+    if (mMove)
+    {
+        Ogre::Vector3 deplacement = Ogre::Vector3::UNIT_Z * deltaTime * RUN_SPEED;
+        mNodeMainPlayer->translate(mNode->getOrientation() * mNodeMainPlayer->getOrientation() * deplacement);
+    }
     
     // Mise à jour des animations
     mAnimTime += deltaTime;
