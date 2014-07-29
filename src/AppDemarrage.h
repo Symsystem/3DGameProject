@@ -24,7 +24,7 @@ public:
     void setupScene();
 	void remplirScene();
 	void createFrameListener();
-    //void createTerrain();
+    void createTerrain();
 
 private:
 	Ogre::Root *mRoot;
@@ -42,8 +42,8 @@ private:
 	Ogre::Entity *mRobot;
 	Ogre::AnimationState* mAnimationState;
     
-//    Ogre::Terrain* mTerrain;
-//    Ogre::TerrainGlobalOptions* mTerrainOptions;
+    Ogre::Terrain* mTerrain;
+    Ogre::TerrainGlobalOptions* mTerrainOptions;
 
 	InputListener* mInputListener;
 };

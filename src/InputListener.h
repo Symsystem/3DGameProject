@@ -10,8 +10,8 @@
 
 #include <Ogre.h>
 #include <OIS.h>
-#include "NewCamera.h"
-#include "Player.h"
+#include "entity/NewCamera.h"
+#include "entity/Player.h"
 
 class InputListener : public Ogre::FrameListener, public Ogre::WindowEventListener, OIS::KeyListener, OIS::MouseListener {
 

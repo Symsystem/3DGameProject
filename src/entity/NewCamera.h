@@ -9,7 +9,7 @@
 #ifndef ___DGameProject__NewCamera__
 #define ___DGameProject__NewCamera__
 
-#define HEIGHT_CAMERA 5
+#define HEIGHT_CAMERA 500
 #define SPEED_CAMERA 9
 #define MAX_ZOOM 25
 #define MIN_ZOOM 8

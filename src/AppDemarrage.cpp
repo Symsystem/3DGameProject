@@ -112,7 +112,7 @@ void AppDemarrage::setupScene()
     mNodeMainPlayer = mSceneMgr->getRootSceneNode()->createChildSceneNode("nodeMainPlayer");
     
     // Création du player
-    mPlayer = new Player(mSceneMgr, "sinbad", "Sinbad.mesh", mNodeMainPlayer, Ogre::Vector3(0, 5, 0));
+    mPlayer = new Player(mSceneMgr, "sinbad", "Sinbad.mesh", mNodeMainPlayer, Ogre::Vector3(0, 50, 0));
     
     // Création de la camera (associée au player)
     mCamera = new NewCamera("camera1", mSceneMgr, mNodeMainPlayer, mPlayer);
@@ -124,7 +124,7 @@ void AppDemarrage::setupScene()
     
     // Réglage de la précision des textures pour les matériaux (ici anisotrope).
     Ogre::MaterialManager::getSingleton().setDefaultTextureFiltering(Ogre::TFO_ANISOTROPIC);
-    Ogre::MaterialManager::getSingleton().setDefaultAnisotropy(7);
+    Ogre::MaterialManager::getSingleton().setDefaultAnisotropy(8);
 }
 
 void AppDemarrage::remplirScene()
@@ -143,7 +143,7 @@ void AppDemarrage::remplirScene()
     mLight->setCastShadows(true);
 
 	// Ajout des modèles 3D
-    Ogre::Entity *bonhomme = mSceneMgr->createEntity("2eBonhomme", "sinbad.mesh");
+    Ogre::Entity *bonhomme = mSceneMgr->createEntity("2eBonhomme", "Sinbad.mesh");
     Ogre::SceneNode *nodeBon = mSceneMgr->getRootSceneNode()->createChildSceneNode();
     nodeBon->attachObject(bonhomme);
     nodeBon->setPosition(Ogre::Vector3(100, 5, 100));
@@ -165,8 +165,7 @@ void AppDemarrage::remplirScene()
     entSol->setMaterialName("grassFloor");
     entSol->setCastShadows(false);
     
-    
-    //createTerrain();
+    createTerrain();
 }
 
 void AppDemarrage::createFrameListener()
@@ -175,53 +174,58 @@ void AppDemarrage::createFrameListener()
     mRoot->addFrameListener(mInputListener);
 }
 
-//void AppDemarrage::createTerrain()
-//{
-//    mTerrain = OGRE_NEW Ogre::Terrain(mSceneMgr);
-//    
-//    // options globales
-//    mTerrainOptions = OGRE_NEW Ogre::TerrainGlobalOptions();
-//    mTerrainOptions->setMaxPixelError(8);
-//    mTerrainOptions->setCompositeMapDistance(3000);
-//    
-//    mTerrainOptions->setLightMapDirection(mLight->getDerivedDirection());
-//    mTerrainOptions->setCompositeMapAmbient(mSceneMgr->getAmbientLight());
-//    mTerrainOptions->setCompositeMapDiffuse(mLight->getDiffuseColour());
-//    
-//    Ogre::Image img;
-//    img.load("terrain.png", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-//    
-//    // informations géométriques
-//    Ogre::Terrain::ImportData imp;
-//    imp.inputImage = &img;
-//    imp.terrainSize = img.getSize();
-//    imp.worldSize = 1000;
-//    imp.inputScale = 300;
-//    imp.minBatchSize = 33;
-//    imp.maxBatchSize = 65;
-//    
-//    // textures
-//    imp.layerList.resize(1);
-//    imp.layerList[0].worldSize = 50;
-//    imp.layerList[0].textureNames.push_back("terrain.png");
-//    imp.layerList[0].textureNames.push_back("terrain.png");
-//    mTerrain->prepare(imp);
-//    mTerrain->load();
-//    
-//    // plaquage de texture
-//    Ogre::TerrainLayerBlendMap* blendMap1 = mTerrain->getLayerBlendMap(1);
-//    float* pBlend1 = blendMap1->getBlendPointer();
-//    
-//    for (Ogre::uint16 y = 0; y < mTerrain->getLayerBlendMapSize(); ++y)
-//    {
-//        for (Ogre::uint16 x = 0; x < mTerrain->getLayerBlendMapSize(); ++x)
-//        {
-//            *pBlend1++ = 150;
-//        }
-//    }
-//    
-//    blendMap1->dirty();
-//    blendMap1->update();
-//    
-//    mTerrain->freeTemporaryResources();
-//}
+void AppDemarrage::createTerrain()
+{
+    // options globales
+    mTerrainOptions = OGRE_NEW Ogre::TerrainGlobalOptions();
+    mTerrainOptions->setMaxPixelError(8);
+    mTerrainOptions->setLightMapDirection(mLight->getDerivedDirection());
+    mTerrainOptions->setCompositeMapDistance(3000);
+    mTerrainOptions->setCompositeMapAmbient(mSceneMgr->getAmbientLight());
+    mTerrainOptions->setCompositeMapDiffuse(mLight->getDiffuseColour());
+
+    mTerrain = OGRE_NEW Ogre::Terrain(mSceneMgr);
+
+    Ogre::Image img;
+    img.load("terrain.png", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+
+    // informations géométriques
+    Ogre::Terrain::ImportData imp;
+    imp.inputImage = &img;
+    imp.terrainSize = img.getWidth();
+    imp.worldSize = 8000;
+    imp.inputScale = 600;
+    imp.minBatchSize = 33;
+    imp.maxBatchSize = 65;
+
+    // textures
+    imp.layerList.resize(3);
+    imp.layerList[0].worldSize = 100;
+    imp.layerList[0].textureNames.push_back("grass_green-01_diffusespecular.dds");
+    imp.layerList[0].textureNames.push_back("grass_green-01_normalheight.dds");
+    imp.layerList[1].worldSize = 30;
+    imp.layerList[1].textureNames.push_back("growth_weirdfungus-03_diffusespecular.dds");
+    imp.layerList[1].textureNames.push_back("growth_weirdfungus-03_normalheight.dds");
+    imp.layerList[2].worldSize = 200;
+    imp.layerList[2].textureNames.push_back("dirt_grayrocky_diffusespecular.dds");
+    imp.layerList[2].textureNames.push_back("dirt_grayrocky_normalheight.dds");
+    mTerrain->prepare(imp);
+    mTerrain->load();
+
+    // plaquage de texture
+    Ogre::TerrainLayerBlendMap* blendMap1 = mTerrain->getLayerBlendMap(1);
+    float* pBlend1 = blendMap1->getBlendPointer();
+
+    for (Ogre::uint16 y = 0; y < mTerrain->getLayerBlendMapSize(); ++y)
+    {
+        for (Ogre::uint16 x = 0; x < mTerrain->getLayerBlendMapSize(); ++x)
+        {
+            *pBlend1++ = 150;
+        }
+    }
+
+    blendMap1->dirty();
+    blendMap1->update();
+
+    mTerrain->freeTemporaryResources();
+}
