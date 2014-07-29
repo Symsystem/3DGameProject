@@ -24,6 +24,9 @@ lib/*
 bin/*
 Debug/*
 Release/*
+build/*
 
 # Others
 Ogre.log
+ogre.cfg
+plugins.cfg
